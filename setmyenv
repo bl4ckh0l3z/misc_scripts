@@ -1,0 +1,126 @@
+#!/bin/bash
+#
+# Script for setting my custom environment under Debian_8.2_x64_EN
+#
+# __author__ = 'bl4ckh0l3'
+# __license__ = 'GPL v2'
+# __maintainer__ = 'bl4ckh0l3'
+# __email__ = 'bl4ckh0l3z@gmail.com'
+#
+
+dir_tmp="./tmp"
+
+to_install_apt_dev=('build-essential' 'git' 'subversion' 'python3' 'python3-pip' 'python3-dev' 'python-virtualenv' 'gdb')
+to_install_apt_fware=('firmware-ralink' 'firmware-linux-nonfree') 
+to_install_apt_misc=('gimp' 'irssi' 'brasero')
+to_install_apt_sec=('tor' 'proxychains' 'nmap' 'wireshark' 'libimage-exiftool-perl')
+to_install_apt_sys=('vim' 'unrar' 'deborphan' 'software-properties-common' 'htop' 'terminator' 'curl' 'ssh' 'virtualbox' 'virtualbox-guest-additions-iso')
+to_install_apt=(${to_install_apt_dev[@]} ${to_install_apt_fware[@]} ${to_install_apt_misc[@]} ${to_install_apt_sec[@]} ${to_install_apt_sys[@]})
+declare -A to_install_http
+to_install_http=(["skype"]="http://www.skype.com/go/getskype-linux-deb" ["pycharm"]="https://download.jetbrains.com/python/pycharm-community-5.0.3.tar.gz" ["subl"]="https://download.sublimetext.com/sublime-text_build-3083_amd64.deb" ["teamviewer"]="http://download.teamviewer.com/download/teamviewer_i386.deb")
+to_uninstall_apt=('evolution' 'libreoffice*' 'gnome-chess' 'gnome-mahjongg' 'gnome-mines' 'gnome-nibbles' 'gnome-robots' 'gnome-sudoku' 'gnome-tetravex')
+
+function install_apt() {
+    for i in "${to_install_apt[@]}"; do
+	status=$(apt-get install -s $i)
+	is_installed=$(echo $status | grep -c "$i is already the newest version")
+
+	if [ $is_installed -eq 1 ]; then
+	    echo -e "\n   = $i is already installed"
+	else
+	    is_upgradable=$(echo $status | tr -d '\n' | egrep -c "The following packages will be upgraded:(\s|[-_a-zA-Z0-9])*$i")
+
+	    if [ $is_upgradable -eq 1 ]; then
+		echo -e "\n   * $i is upgradable; upgrade in progress..."
+		sudo apt-get -q install --only-upgrade $i
+	    else
+		echo -e "\n   + $i is not installed; installation in progress..."
+		sudo apt-get -q install $i
+	    fi
+	fi
+    done
+}
+
+function install_http() {
+    for i in ${!to_install_http[@]}; do
+	echo -e "\n  # Installing $i"
+	if [ $(which $i | wc -l) -eq 1 ]; then
+	    echo -e "  = $i is already installed"
+	else
+	    echo -e "  + $i is not installed; installation in progress..."
+            file_name=$i-install
+	    wget -q -O $dir_tmp/$file_name ${to_install_http[$i]}
+            file_type=$(file $dir_tmp/$file_name | grep -c "Debian binary package" && echo "deb" || echo "")
+            if [ $file_type -eq "" ]; then
+                file_type=$(file $dir_tmp/$file_name | grep -c "gzip compressed data, from FAT filesystem" && echo "tar.gz" || echo "")
+            fi
+            mv $dir_tmp/$file_name $dir_tmp/$file_name.$file_type
+            if [ $file_type -eq "deb" ]; then
+                sudo dpkg -i $dir_tmp/$file_name.$file_type
+            elif [ $file_type -eq "tar.gz" ]; then
+                sudo tar xzvf $dir_tmp/$file_name.$file_type -C /opt/ 
+                elem=$(ls /opt/ | grep $i)
+                sudo ln -s /opt/$elem/bin/$i.sh /usr/bin/$i
+            fi
+	    sudo apt-get -f install
+	fi
+
+    done
+}
+
+function install_special() {
+    echo -e "\n  # Installing Spotify"
+    if [ $(which spotify | wc -l) -eq 1 ]; then
+	echo -e "  = Spotify is already installed"
+    else
+	echo -e "  + Spotify is not installed; installation in progress..."
+	sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys BBEBDCB318AD50EC6865090613B00F1FD2C19886
+	echo deb http://repository.spotify.com stable non-free | sudo tee /etc/apt/sources.list.d/spotify.list
+	sudo apt-get update
+	wget -q -O $dir_tmp/libgcrypt11-install.deb https://launchpad.net/ubuntu/+archive/primary/+files/libgcrypt11_1.5.3-2ubuntu4.2_amd64.deb
+	sudo dpkg -i $dir_tmp/libgcrypt11-install.deb
+	sudo apt-get install spotify-client
+    fi
+}
+
+function uninstall_apt() {
+    for i in "${to_uninstall_apt[@]}"; do
+	status=$(apt-get remove -s $i)
+
+	if [ $? -ne 0 ]; then
+	    echo -e "\n  = $i is not installed, and it doesn't exist"
+        else
+	    is_not_installed=$(echo $status | grep -c "is not installed, so not removed")
+	    if [ $is_not_installed -eq 1 ]; then
+	        echo -e "\n  = $i is not installed"
+	    else
+		echo -e "\n  - $i is installed; uninstallation in progress..."
+		sudo apt-get purge $i
+	    fi
+	fi
+    done
+}
+
+
+echo -e "\n## Adding the i386 arch"
+sudo dpkg --add-architecture i386
+
+echo -e "\n## Cleaning the APT cache"
+sudo apt-get -q clean
+
+echo -e "\n## Updating the APT index"
+sudo apt-get -q update
+
+echo -e "\n## Installing APT packages"
+install_apt
+
+echo -e "\n## Installing misc tools from the web"
+echo -e "\n  # Creating the 'tmp' dir"
+mkdir $dir_tmp
+install_http
+install_special
+echo -e "\n  # Removing the 'tmp' dir"
+rm -R $dir_tmp
+
+echo -e "\n## Uninstalling unuseful APT packages"
+uninstall_apt
