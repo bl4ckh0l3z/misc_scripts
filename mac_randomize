@@ -1,0 +1,26 @@
+#!/bin/bash
+#
+# Script for randomize the MAC address
+#
+# __author__ = 'bl4ckh0l3'
+# __license__ = 'GPL v2'
+# __maintainer__ = 'bl4ckh0l3'
+# __email__ = 'bl4ckh0l3z@gmail.com'
+#
+
+interface=""
+interfaces=$(sudo ifconfig | cut -d" " -f1 | sort -u | egrep -v "^$")
+
+echo -e "\nPlease select the interface for the mac address you want to randomize:"
+for i in $interfaces;do
+    echo -e "  -$i"
+done
+read interface
+
+macaddr_old=$(sudo ifconfig $interface | egrep -o "([a-zA-Z0-9]{2}:){5}[a-zA-Z0-9]{2}")
+macaddr_new=$(printf '%02x' $((0x$(od /dev/urandom -N1 -t x1 -An | cut -c 2-) & 0xFE | 0x02)); od /dev/urandom -N5 -t x1 -An | sed 's/ /:/g');
+
+echo "Changing your mac address from '$macaddr_old' to '$macaddr_new'"
+sudo ifconfig $interface down
+sudo ifconfig $interface hw ether $macaddr_new
+sudo ifconfig $interface up
