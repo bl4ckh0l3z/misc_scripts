@@ -19,7 +19,7 @@ to_install_apt_sys=('wine' 'vim' 'pm-utils' 'unrar' 'deborphan' 'software-proper
 to_install_apt=(${to_install_apt_dev[@]} ${to_install_apt_fware[@]} ${to_install_apt_misc[@]} ${to_install_apt_sec[@]} ${to_install_apt_sys[@]})
 declare -A to_install_http
 to_install_http=(["skype"]="http://www.skype.com/go/getskype-linux-deb" ["pycharm"]="https://download.jetbrains.com/python/pycharm-community-5.0.3.tar.gz" ["subl"]="https://download.sublimetext.com/sublime-text_build-3083_amd64.deb" ["teamviewer"]="http://download.teamviewer.com/download/teamviewer_i386.deb")
-to_uninstall_apt=('evolution' 'libreoffice*' 'gnome-chess' 'gnome-mahjongg' 'gnome-mines' 'gnome-nibbles' 'gnome-robots' 'gnome-sudoku' 'gnome-tetravex')
+to_uninstall_apt=('evolution' 'libreoffice*' 'gnome-chess' 'gnome-mahjongg' 'gnome-mines' 'gnome-nibbles' 'gnome-robots' 'gnome-sudoku' 'gnome-tetravex' 'bogofilter' 'hoichess' 'fairymax' 'xboard')
 
 function install_apt() {
     for i in "${to_install_apt[@]}"; do
