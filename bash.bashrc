@@ -62,6 +62,9 @@ alias monitor="xrandr --output eDP1 --auto --output HDMI1 --auto --right-of eDP1
 #alias share="sudo mount -t vboxsf -o rw,uid=1000,gid=1000 share /media/sf_SHARE"
 alias myip="wget -qO- http://ipecho.net/plain 2> /dev/null ; echo"
 alias mytorip="torify wget -qO- http://ipecho.net/plain 2> /dev/null ; echo"
+alias vpn_dcs="sudo openvpn --config /home/xyz/client.ovpn"
+alias davmail="/opt/davmail-linux-x86_64-4.7.1-2416/davmail.sh & disown"
+alias netmon="sudo netstat -netpc | egrep -v "127\.0\.0\.1:[0-9]{1,6}[[:blank:]]*127\.0\.0\.1:[0-9]{1,6}" | grep -v "iceweasel" | grep "192.168.""
 
 # COLORIZE MY TERMINAL
 color_prompt=yes
