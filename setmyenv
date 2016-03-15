@@ -11,11 +11,11 @@
 dir_tmp="./tmp"
 dir_iso="/mnt/iso"
 
-to_install_apt_dev=('build-essential' 'git' 'subversion' 'python3' 'python3-pip' 'python3-dev' 'python-virtualenv' 'gdb')
+to_install_apt_dev=('openjdk-7-jdk' 'ant' 'build-essential' 'git' 'subversion' 'python3' 'python3-pip' 'python3-dev' 'python-virtualenv' 'gdb')
 to_install_apt_fware=('firmware-ralink' 'firmware-linux-nonfree') 
 to_install_apt_misc=('gimp' 'irssi' 'brasero')
-to_install_apt_sec=('tor' 'proxychains' 'nmap' 'wireshark' 'libimage-exiftool-perl')
-to_install_apt_sys=('wine' 'vim' 'pm-utils' 'unrar' 'deborphan' 'software-properties-common' 'htop' 'terminator' 'curl' 'ssh' 'virtualbox' 'virtualbox-guest-additions-iso')
+to_install_apt_sec=('tor' 'proxychains' 'nmap' 'wireshark' 'libimage-exiftool-perl' 'poppler-utils')
+to_install_apt_sys=('wine' 'vim' 'pm-utils' 'unrar' 'deborphan' 'software-properties-common' 'htop' 'terminator' 'curl' 'ssh' 'virtualbox' 'virtualbox-guest-additions-iso' 'msttcorefonts')
 to_install_apt=(${to_install_apt_dev[@]} ${to_install_apt_fware[@]} ${to_install_apt_misc[@]} ${to_install_apt_sec[@]} ${to_install_apt_sys[@]})
 declare -A to_install_http
 to_install_http=(["skype"]="http://www.skype.com/go/getskype-linux-deb" ["pycharm"]="https://download.jetbrains.com/python/pycharm-community-5.0.3.tar.gz" ["subl"]="https://download.sublimetext.com/sublime-text_build-3083_amd64.deb" ["teamviewer"]="http://download.teamviewer.com/download/teamviewer_i386.deb")
